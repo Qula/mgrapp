@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 
 public class MySQLAccess {
     private Connection connect = null;
@@ -20,9 +19,15 @@ public class MySQLAccess {
 
 
     private void connectToDB() throws Exception{
-        //Class.forName("com.mysql.jdbc.Driver");
-        connect = DriverManager.getConnection(url, user, password);
-        statement = connect.createStatement();
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            connect = DriverManager.getConnection(url, user, password);
+            statement = connect.createStatement();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -30,17 +35,19 @@ public class MySQLAccess {
         try {
             connectToDB();
 
-            resultSet = statement
-                    .executeQuery("select * from mgr.test");
-            writeResultSet(resultSet);
+            resultSet = statement.
+                    executeQuery("select a.mach, b.tat " +
+                            "from mgr.dane a inner join mgr.back b " +
+                            "on a.ffa=b.ffa " +
+                            "where b.gm = 60000;");
 
-            resultSet = statement
-                    .executeQuery("select * from mgr.test");
-            dbInfo(resultSet);
+//            dbInfo(resultSet);
 
-        } catch (Exception e) {
-
-        } finally {
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }finally {
             close();
         }
     }
@@ -50,14 +57,14 @@ public class MySQLAccess {
         try {
             connectToDB();
 
-            preparedStatement = connect
-                    .prepareStatement("insert into  mgr.test values (default, ?, ?)");
+            for(int i=0; i<10000; i++){
+                statement.executeUpdate("INSERT INTO mgr.baza " +
+                                "VALUES (10950.5, 0.8, 251.10, 60234.0, 0.299);");
+            }
 
-            preparedStatement.setString(1, "Test"); // start with 1
-            preparedStatement.setDate(2, java.sql.Date.valueOf(java.time.LocalDate.now()));
-            preparedStatement.executeUpdate();
-
-        } catch (Exception e) {
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
             System.out.println(e.getMessage());
         } finally {
             close();
@@ -65,16 +72,35 @@ public class MySQLAccess {
     }
 
 
-    public void deleteRow(int i) throws SQLException {
+    public void deleteRow(double mach) throws SQLException {
         try {
             connectToDB();
 
             preparedStatement = connect
-                    .prepareStatement("delete from mgr.test where id= ? ; ");
-            preparedStatement.setInt(1, i);
-            preparedStatement.executeUpdate();
+                    .prepareStatement("DELETE FROM mgr.baza WHERE mach= ? ;");
+            preparedStatement.setDouble(1, mach);
+            preparedStatement.execute();
 
-        } catch (Exception e) {
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+    }
+
+
+    public void updateRow() throws SQLException {
+        try {
+            connectToDB();
+
+            statement.executeUpdate("UPDATE mgr.baza SET alt_std = alt_std + 0.5, tat = tat + 0.3, ffa = ffa + 0.01 " +
+                    "WHERE mach between 0.77 AND 0.85;");
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
             System.out.println(e.getMessage());
         } finally {
             close();
@@ -87,19 +113,6 @@ public class MySQLAccess {
         System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
         for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
             System.out.println("Column " + i + ": " + resultSet.getMetaData().getColumnName(i));
-        }
-    }
-
-
-    private void writeResultSet(ResultSet resultSet) throws SQLException {
-        while (resultSet.next()) {
-            String id = resultSet.getString("id");
-            String text = resultSet.getString("text");
-            Date date = resultSet.getDate("date");
-            System.out.println("ID: " + id);
-            System.out.println("Text: " + text);
-            System.out.println("Date: " + date);
-            System.out.println("- - - - -");
         }
     }
 

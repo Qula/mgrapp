@@ -18,9 +18,15 @@ public class MonetDBAccess {
     private String password = "voc";
 
     private void connectToDB() throws Exception{
-        Class.forName("nl.cwi.monetdb.jdbc.MonetDriver");
-        connect = DriverManager.getConnection(url, user, password);
-        statement = connect.createStatement();
+        try {
+            Class.forName("nl.cwi.monetdb.jdbc.MonetDriver");
+            connect = DriverManager.getConnection(url, user, password);
+            statement = connect.createStatement();
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -28,13 +34,18 @@ public class MonetDBAccess {
         try {
             connectToDB();
 
-            resultSet = statement.executeQuery("SELECT * FROM soldiers;");
-            writeResultSet(resultSet);
+            resultSet = statement.
+                    executeQuery("select a.mach, b.tat " +
+                            "from dane a inner join back b " +
+                            "on a.ffa=b.ffa " +
+                            "where b.gm = 60000;");
 
-            dbInfo(resultSet);
+//            dbInfo(resultSet);
 
+        }catch(SQLException se){
+            se.printStackTrace();
         }catch (Exception e){
-
+            System.out.println(e.getMessage());
         }finally {
             close();
         }
@@ -45,13 +56,14 @@ public class MonetDBAccess {
         try {
             connectToDB();
 
-            preparedStatement = connect
-                    .prepareStatement("insert into  passengers values (125, '' , ?, null ,90, null, null, null, null, null)");
+            for(int i=0; i<10000; i++){
+                statement.executeUpdate("INSERT INTO back " +
+                        "VALUES (10950.5, 0.8, 251.10, 60234.0, 0.299);");
+            }
 
-            preparedStatement.setInt(1, 3); // start with 1
-            preparedStatement.executeUpdate();
-
-        } catch (Exception e) {
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
             System.out.println(e.getMessage());
         } finally {
             close();
@@ -59,38 +71,46 @@ public class MonetDBAccess {
     }
 
 
-    public void deleteRow(int i) throws SQLException {
+    public void deleteRow(double mach) throws SQLException {
         try {
             connectToDB();
 
             preparedStatement = connect
-                    .prepareStatement("delete from passengers where number= ? ; ");
-            preparedStatement.setInt(1, i);
+                    .prepareStatement("DELETE FROM back WHERE mach= ? ;");
+            preparedStatement.setDouble(1, mach);
             preparedStatement.executeUpdate();
 
-        } catch (Exception e) {
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
             System.out.println(e.getMessage());
         } finally {
             close();
         }
     }
 
+
+    public void updateRow() throws SQLException {
+        try {
+            connectToDB();
+
+            statement.executeUpdate("UPDATE back SET alt_std = alt_std + 0.5, tat = tat + 0.3, ffa = ffa + 0.01 " +
+                    "WHERE mach between 0.77 AND 0.85;");
+
+        }catch(SQLException se){
+            se.printStackTrace();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        } finally {
+            close();
+        }
+    }
 
     private void dbInfo(ResultSet resultSet) throws SQLException {
 
         System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
         for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
             System.out.println("Column " + i + ": " + resultSet.getMetaData().getColumnName(i));
-        }
-    }
-
-
-    private void writeResultSet(ResultSet resultSet) throws SQLException {
-        while (resultSet.next()) {
-            for (int j = 1; j <= resultSet.getMetaData().getColumnCount(); j++) {
-                System.out.print(resultSet.getString(j) + "\t");
-            }
-            System.out.println("");
         }
     }
 
