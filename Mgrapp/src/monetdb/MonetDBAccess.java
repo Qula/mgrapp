@@ -30,17 +30,14 @@ public class MonetDBAccess {
     }
 
 
-    public void readDataBase() throws Exception {
+    public void readDataBase(String query) throws Exception {
         try {
             connectToDB();
 
-            resultSet = statement.
-                    executeQuery("select a.mach, b.tat " +
-                            "from dane a inner join back b " +
-                            "on a.ffa=b.ffa " +
-                            "where b.gm = 60000;");
+            System.out.println(query);
 
-//            dbInfo(resultSet);
+            resultSet = statement.
+                    executeQuery(query);
 
         }catch(SQLException se){
             se.printStackTrace();
@@ -52,13 +49,14 @@ public class MonetDBAccess {
     }
 
 
-    public void insertData() throws SQLException {
+    public void insertData(String query) throws SQLException {
         try {
             connectToDB();
 
-            for(int i=0; i<10000; i++){
-                statement.executeUpdate("INSERT INTO back " +
-                        "VALUES (10950.5, 0.8, 251.10, 60234.0, 0.299);");
+            System.out.println(query);
+
+            for(int i=0; i<1000; i++){
+                statement.executeUpdate(query);
             }
 
         }catch(SQLException se){
@@ -71,14 +69,13 @@ public class MonetDBAccess {
     }
 
 
-    public void deleteRow(double mach) throws SQLException {
+    public void deleteRow(String query) throws SQLException {
         try {
             connectToDB();
 
-            preparedStatement = connect
-                    .prepareStatement("DELETE FROM back WHERE mach= ? ;");
-            preparedStatement.setDouble(1, mach);
-            preparedStatement.executeUpdate();
+            System.out.println(query);
+
+            statement.executeUpdate(query);
 
         }catch(SQLException se){
             se.printStackTrace();
@@ -90,12 +87,13 @@ public class MonetDBAccess {
     }
 
 
-    public void updateRow() throws SQLException {
+    public void updateRow(String query) throws SQLException {
         try {
             connectToDB();
 
-            statement.executeUpdate("UPDATE back SET alt_std = alt_std + 0.5, tat = tat + 0.3, ffa = ffa + 0.01 " +
-                    "WHERE mach between 0.77 AND 0.85;");
+            System.out.println(query);
+
+            statement.executeUpdate(query);
 
         }catch(SQLException se){
             se.printStackTrace();

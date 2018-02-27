@@ -17,7 +17,6 @@ public class MySQLAccess {
     private String user = "root";
     private String password = "";
 
-
     private void connectToDB() throws Exception{
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -31,17 +30,14 @@ public class MySQLAccess {
     }
 
 
-    public void readDataBase() throws Exception {
+    public void readDataBase(String query) throws Exception {
         try {
             connectToDB();
 
-            resultSet = statement.
-                    executeQuery("select a.mach, b.tat " +
-                            "from mgr.dane a inner join mgr.back b " +
-                            "on a.ffa=b.ffa " +
-                            "where b.gm = 60000;");
+            System.out.println(query);
 
-//            dbInfo(resultSet);
+            resultSet = statement.
+                    executeQuery(query);
 
         }catch(SQLException se){
             se.printStackTrace();
@@ -53,13 +49,14 @@ public class MySQLAccess {
     }
 
 
-    public void insertData() throws SQLException {
+    public void insertData(String query) throws SQLException {
         try {
             connectToDB();
 
-            for(int i=0; i<10000; i++){
-                statement.executeUpdate("INSERT INTO mgr.baza " +
-                                "VALUES (10950.5, 0.8, 251.10, 60234.0, 0.299);");
+            System.out.println(query);
+
+            for(int i=0; i<1000; i++){
+                statement.executeUpdate(query);
             }
 
         }catch(SQLException se){
@@ -72,15 +69,13 @@ public class MySQLAccess {
     }
 
 
-    public void deleteRow(double mach) throws SQLException {
+    public void deleteRow(String query) throws SQLException {
         try {
             connectToDB();
 
-            preparedStatement = connect
-                    .prepareStatement("DELETE FROM mgr.baza WHERE mach= ? ;");
-            preparedStatement.setDouble(1, mach);
-            preparedStatement.execute();
+            System.out.println(query);
 
+            statement.executeUpdate(query);
         }catch(SQLException se){
             se.printStackTrace();
         }catch (Exception e){
@@ -91,12 +86,13 @@ public class MySQLAccess {
     }
 
 
-    public void updateRow() throws SQLException {
+    public void updateRow(String query) throws SQLException {
         try {
             connectToDB();
 
-            statement.executeUpdate("UPDATE mgr.baza SET alt_std = alt_std + 0.5, tat = tat + 0.3, ffa = ffa + 0.01 " +
-                    "WHERE mach between 0.77 AND 0.85;");
+            System.out.println(query);
+
+            statement.executeUpdate(query);
 
         }catch(SQLException se){
             se.printStackTrace();

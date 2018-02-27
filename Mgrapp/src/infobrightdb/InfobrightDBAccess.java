@@ -29,15 +29,13 @@ public class InfobrightDBAccess {
         }
     }
 
-    public void readDatabase() throws Exception{
+    public void readDatabase(String query) throws Exception{
         try{
             connectToDB();
-            resultSet = statement.executeQuery("SELECT a.mach, b.tat " +
-                    "from mysql.dane a inner join mysql.back b " +
-                    "on a.ffa=b.ffa " +
-                    "where a.gm = 60000;");
 
-//            dbInfo(resultSet);
+            System.out.println(query);
+
+            resultSet = statement.executeQuery(query);
 
         }catch(SQLException se){
             se.printStackTrace();
